@@ -3,7 +3,7 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.Azure.Devices.Client;
+using Microsoft.Azure.IoTMQ.IoTHubConnector.Client;
 using OpcPublisher.Interfaces;
 using System;
 using System.Threading.Tasks;
@@ -107,9 +107,9 @@ namespace OpcPublisher
         /// <summary>
         /// Create ModuleClient from the specified connection string using the specified transport type
         /// </summary>
-        public static IHubClient CreateModuleClientFromConnectionString(string connectionString, TransportType transportType)
+        public static IHubClient CreateModuleClientFromConnectionString(string connectionString, Microsoft.Azure.IoTMQ.IoTHubConnector.Client.TransportType transportType)
         {
-            return new HubClient(ModuleClient.CreateFromConnectionString(connectionString, transportType));
+            return new HubClient(ModuleClient.CreateFromConnectionString(connectionString));
         }
 
         /// <summary>
@@ -127,15 +127,15 @@ namespace OpcPublisher
         /// <summary>
         /// Sets the retry policy used in the operation retries.
         /// </summary>
-        public void SetRetryPolicy(IRetryPolicy retryPolicy)
-        {
-            if (_iotHubClient == null)
-            {
-                _edgeHubClient.SetRetryPolicy(retryPolicy);
-                return;
-            }
-            _iotHubClient.SetRetryPolicy(retryPolicy);
-        }
+        //public void SetRetryPolicy(IRetryPolicy retryPolicy)
+        //{
+        //    if (_iotHubClient == null)
+        //    {
+        //        _edgeHubClient.SetRetryPolicy(retryPolicy);
+        //        return;
+        //    }
+        //    _iotHubClient.SetRetryPolicy(retryPolicy);
+        //}
 
         /// <summary>
         /// Registers a new delegate for the connection status changed callback. If a delegate is already associated,

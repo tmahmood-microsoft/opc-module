@@ -3,9 +3,10 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.Azure.Devices.Client;
+using Microsoft.Azure.IoTMQ.IoTHubConnector.Client;
 using Newtonsoft.Json;
 using OpcPublisher.Configurations;
+using OpcPublisher.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,7 +34,7 @@ namespace OpcPublisher
         private void CheckWhetherToSkip() {
             Skip.If(_server.Plc == null, "Server not reachable - Ensure docker endpoint is properly configured.");
             try {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
             }
             catch {
                 Skip.If(true, "IoT Hub not configured.");
@@ -89,7 +90,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -158,7 +159,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -226,7 +227,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -292,7 +293,7 @@ namespace OpcPublisher
             UnitTestHelper.SetPublisherDefaults();
 
             try {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -360,7 +361,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -428,7 +429,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -497,7 +498,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -566,7 +567,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -635,7 +636,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -703,7 +704,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -771,7 +772,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -839,7 +840,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -907,7 +908,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -976,7 +977,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -1045,7 +1046,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
@@ -1113,7 +1114,7 @@ namespace OpcPublisher
 
             try
             {
-                Hub = IotHubCommunication.Instance;
+                Hub = (IHubCommunication)IotHubCommunication.Instance;
                 NodeConfiguration = PublisherNodeConfiguration.Instance;
                 Assert.True(NodeConfiguration.OpcSessions.Count == 0, "wrong # of sessions");
                 Assert.True(NodeConfiguration.NumberOfOpcSessionsConfigured == 0, "wrong # of sessions");
