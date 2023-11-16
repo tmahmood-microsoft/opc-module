@@ -3,7 +3,7 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.Azure.IoTMQ.IoTHubConnector.Client;
+using Microsoft.Azure.Devices.Client;
 using Newtonsoft.Json;
 using Opc.Ua;
 using Opc.Ua.Server;
