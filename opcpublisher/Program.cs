@@ -222,11 +222,11 @@ namespace OpcPublisher
 
                         // IoTHub specific options
                         { "ih|iothubprotocol=", $"the protocol to use for communication with IoTHub (allowed values: {$"{string.Join(", ", Enum.GetNames(HubProtocol.GetType()))}"}) or IoT EdgeHub (allowed values: Mqtt_Tcp_Only, Amqp_Tcp_Only).\nDefault for IoTHub: {IotHubProtocolDefault}\nDefault for IoT EdgeHub: {IotEdgeHubProtocolDefault}",
-                            (Microsoft.Azure.Devices.Client.TransportType p) => {
+                            (Microsoft.Azure.IoTMQ.IoTHubConnector.Client.TransportType p) => {
                                 HubProtocol = p;
                                 if (RunningInIoTEdgeContext)
                                 {
-                                    if (p != Microsoft.Azure.Devices.Client.TransportType.Mqtt_Tcp_Only && p != Microsoft.Azure.Devices.Client.TransportType.Amqp_Tcp_Only)
+                                    if (p != Microsoft.Azure.IoTMQ.IoTHubConnector.Client.TransportType.Mqtt_Tcp_Only && p != Microsoft.Azure.IoTMQ.IoTHubConnector.Client.TransportType.Mqtt)
                                     {
                                         WriteLine("When running as IoTEdge module only Mqtt_Tcp_Only or Amqp_Tcp_Only are supported. Using Amqp_Tcp_Only");
                                         HubProtocol = IotEdgeHubProtocolDefault;
@@ -660,13 +660,13 @@ namespace OpcPublisher
                 }
 
                 // install only if requested
-                if (_installOnly)
-                {
-                    // initialize and start IoTHub communication
-                    Hub = IotHubCommunication.Instance;
-                    Logger.Information("Installation completed. Exiting...");
-                    return;
-                }
+                //if (_installOnly)
+                //{
+                //    // initialize and start IoTHub communication
+                //    Hub = IotHubCommunication.Instance;
+                //    Logger.Information("Installation completed. Exiting...");
+                //    return;
+                //}
 
                 // show version
                 Logger.Information($"OPC Publisher V{FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion} starting up...");

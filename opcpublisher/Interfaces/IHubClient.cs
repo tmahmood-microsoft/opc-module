@@ -3,7 +3,7 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.Azure.Devices.Client;
+using Microsoft.Azure.IoTMQ.IoTHubConnector.Client;
 using System.Threading.Tasks;
 
 namespace OpcPublisher.Interfaces
@@ -32,7 +32,7 @@ namespace OpcPublisher.Interfaces
         /// <summary>
         /// Sets the retry policy used in the operation retries.
         /// </summary>
-        void SetRetryPolicy(IRetryPolicy retryPolicy);
+        //void SetRetryPolicy(IRetryPolicy retryPolicy);
 
         /// <summary>
         /// Registers a new delegate for the connection status changed callback. If a delegate is already associated, 

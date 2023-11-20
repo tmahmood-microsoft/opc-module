@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opc-module
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opc-module
+  template:
+    metadata:
+      labels:
+        app: opc-module
+    spec:
+      containers:
+      - name: opc-module
+        image: <CONTAINER IMAGE LOCATION>
+        imagePullPolicy: Always
+        env:
+        - name: IOTEDGE_IOTHUBHOSTNAME
+          value: <IOT HUB HOST NAME>
+        - name: IOTEDGE_MODULEGENERATIONID
+          value: <MODULE GENERATION ID>
+        - name: IOTEDGE_WORKLOADURI
+          value: <WORKLOAD URI>
+        - name: IOTEDGE_DEVICEID
+          value: <EDGE DEVICE>
+        - name: IOTEDGE_MODULEID
+          value: <MODULE ID>
+        - name: AZEDGE_MQTT_GATEWAY_HOST_NAME
+          value: <GATEWAY HOSTNAME>
+        - name: AZEDGE_MQTT_GATEWAY_CA_FILE
+          value: <CERT FILE>
+        args: ["--pf=/appdata/publishednodes.json"]
+        volumeMounts:
+        - name: opc-config
+          mountPath: /appdata/publishednodes.json
+          subPath: publishednodes.json  
+        - name: ca
+          mountPath: /certs/ca.crt
+          subPath: ca.crt
+        - name: mqtt-client-token
+          mountPath: /var/run/secrets/tokens  
+      volumes:
+      - name: opc-config
+        configMap:
+          name: opc-config
+          items: 
+          - key: publishednodes.json
+            path: publishednodes.json 
+      - name: ca 
+        configMap:
+          name: iotmq-custom-ca
+          items:
+            - key: ca.crt 
+              path: ca.crt
+      - name: mqtt-client-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              path: mqtt-client-token
+              audience: azedge-modules   
