@@ -3,7 +3,7 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using Microsoft.Azure.IoTMQ.IoTHubConnector.Client;
+using Microsoft.Azure.Devices.Client;
 using Newtonsoft.Json;
 using Opc.Ua;
 using OpcPublisher.Interfaces;
@@ -113,9 +113,9 @@ namespace OpcPublisher
         /// <summary>
         /// The protocol to use for hub communication.
         /// </summary>
-        public const Microsoft.Azure.IoTMQ.IoTHubConnector.Client.TransportType IotHubProtocolDefault = Microsoft.Azure.IoTMQ.IoTHubConnector.Client.TransportType.Mqtt;
-        public const Microsoft.Azure.IoTMQ.IoTHubConnector.Client.TransportType IotEdgeHubProtocolDefault = Microsoft.Azure.IoTMQ.IoTHubConnector.Client.TransportType.Mqtt;
-        public static Microsoft.Azure.IoTMQ.IoTHubConnector.Client.TransportType HubProtocol { get; set; } = IotHubProtocolDefault;
+        public const Microsoft.Azure.Devices.Client.TransportType IotHubProtocolDefault = Microsoft.Azure.Devices.Client.TransportType.Mqtt_WebSocket_Only;
+        public const Microsoft.Azure.Devices.Client.TransportType IotEdgeHubProtocolDefault = Microsoft.Azure.Devices.Client.TransportType.Amqp_Tcp_Only;
+        public static Microsoft.Azure.Devices.Client.TransportType HubProtocol { get; set; } = IotHubProtocolDefault;
 
         /// <summary>
         /// Dictionary of available IoTHub direct methods.
@@ -125,7 +125,7 @@ namespace OpcPublisher
         /// <summary>
         /// Check if transport type to use is HTTP.
         /// </summary>
-        //bool IsHttp1Transport();
+        bool IsHttp1Transport() => HubProtocol == Microsoft.Azure.Devices.Client.TransportType.Http1;
 
         /// <summary>
         /// Ctor for the class.
@@ -191,13 +191,13 @@ namespace OpcPublisher
             {
                 // set hub communication parameters
                 _hubClient = hubClient;
-                //ExponentialBackoff exponentialRetryPolicy = new ExponentialBackoff(int.MaxValue, TimeSpan.FromMilliseconds(2), TimeSpan.FromMilliseconds(1024), TimeSpan.FromMilliseconds(3));
+                ExponentialBackoff exponentialRetryPolicy = new ExponentialBackoff(int.MaxValue, TimeSpan.FromMilliseconds(2), TimeSpan.FromMilliseconds(1024), TimeSpan.FromMilliseconds(3));
 
                 // show IoTCentral mode
                 Logger.Information($"IoTCentral mode: {IotCentralMode}");
 
                 _hubClient.ProductInfo = "OpcPublisher";
-                //_hubClient.SetRetryPolicy(exponentialRetryPolicy);
+                _hubClient.SetRetryPolicy(exponentialRetryPolicy);
                 // register connection status change handler
                 _hubClient.SetConnectionStatusChangesHandler(ConnectionStatusChange);
 
@@ -205,14 +205,20 @@ namespace OpcPublisher
                 Logger.Debug($"Open hub communication");
                 await _hubClient.OpenAsync().ConfigureAwait(false);
 
-                Logger.Debug($"Register desired properties and method callbacks");
-
-                // register method handlers
-                foreach (var iotHubMethod in IotHubDirectMethods)
+                // init twin properties and method callbacks (not supported for HTTP)
+                // todo check if this is
+                if (!IsHttp1Transport())
                 {
-                    await _hubClient.SetMethodHandlerAsync(iotHubMethod.Key, iotHubMethod.Value).ConfigureAwait(false);
+                    // init twin properties and method callbacks
+                    Logger.Debug($"Register desired properties and method callbacks");
+
+                    // register method handlers
+                    foreach (var iotHubMethod in IotHubDirectMethods)
+                    {
+                        await _hubClient.SetMethodHandlerAsync(iotHubMethod.Key, iotHubMethod.Value).ConfigureAwait(false);
+                    }
+                    await _hubClient.SetMethodDefaultHandlerAsync(DefaultMethodHandlerAsync).ConfigureAwait(false);
                 }
-                await _hubClient.SetMethodDefaultHandlerAsync(DefaultMethodHandlerAsync).ConfigureAwait(false);
 
                 Logger.Debug($"Init D2C message processing");
                 return await InitMessageProcessingAsync().ConfigureAwait(false);
@@ -1592,8 +1598,9 @@ namespace OpcPublisher
         public virtual async Task MonitoredItemsProcessorAsync(CancellationToken ct)
         {
             uint jsonSquareBracketLength = 2;
+            Message tempMsg = new Message();
             // the system properties are MessageId (max 128 byte), Sequence number (ulong), ExpiryTime (DateTime) and more. ideally we get that from the client.
-            int systemPropertyLength = 128 + sizeof(ulong);
+            int systemPropertyLength = 128 + sizeof(ulong) + tempMsg.ExpiryTimeUtc.ToString(CultureInfo.InvariantCulture).Length;
             int applicationPropertyLength = Encoding.UTF8.GetByteCount($"iothub-content-type={CONTENT_TYPE_OPCUAJSON}") + Encoding.UTF8.GetByteCount($"iothub-content-encoding={CONTENT_ENCODING_UTF8}");
             // if batching is requested the buffer will have the requested size, otherwise we reserve the max size
             uint hubMessageBufferSize = (HubMessageSize > 0 ? HubMessageSize : HubMessageSizeMax) - (uint)systemPropertyLength - jsonSquareBracketLength - (uint)applicationPropertyLength;
@@ -1712,7 +1719,7 @@ namespace OpcPublisher
                         // the batching is completed or we reached the send interval or got a cancelation request
                         try
                         {
-                            Message encodedhubMessage = null;
+                            Microsoft.Azure.Devices.Client.Message encodedhubMessage = null;
 
                             // if we reached the send interval, but have nothing to send (only the opening square bracket is there), we continue
                             if (!gotItem && hubMessage.Position == 1)
@@ -1758,6 +1765,7 @@ namespace OpcPublisher
                                     await _hubClient.SendEventAsync(encodedhubMessage).ConfigureAwait(false);
                                     SentMessages++;
                                     SentLastTime = DateTime.UtcNow;
+                                    Logger.Debug($"Sending {encodedhubMessage.BodyStream.Length} bytes to hub.");
                                 }
                                 catch
                                 {
